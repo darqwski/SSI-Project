@@ -10,6 +10,7 @@ const Products = () => {
 	const [isRefresh, setRefresh] = useState(true)
 	const refresh = () =>  setRefresh(i=>!i);
 	useEffect(()=>{
+		setData([]);
 		Requester({
 			method: 'GET',
 			url: '/API/products?searchQuery='

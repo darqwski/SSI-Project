@@ -154,6 +154,10 @@ router.post('/login', function(req, res, next) {
 		con.query(`SELECT * FROM users WHERE login="${login}" AND password="${md5(password)}"`,  (err, result) => {
 			if (err) throw err;
 			if(result.length===1){
+				if( !result[0].isActive ){
+					res.send(JSON.stringify({ message: 'User is blocked' }));
+					return;
+				}
 				res.cookie('user', login, { signed: true });
 				res.cookie('userId', result[0].userId, { signed: true });
 				res.cookie('login',login);

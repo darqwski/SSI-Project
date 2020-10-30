@@ -11,21 +11,21 @@ const NavBar = () => {
 				<ul className="left">
 					<li><Link to="/">Strona główna</Link></li>
 					{isLogged ? (
-						<li><Link to="logout">Wyloguj</Link></li>
+						<li><Link to="/logout">Wyloguj</Link></li>
 					) : (
 						<>
-							<li><Link to="login">Zaloguj</Link></li>
-							<li><Link to="register">Zarejestruj</Link></li>
+							<li><Link to="/login">Zaloguj</Link></li>
+							<li><Link to="/register">Zarejestruj</Link></li>
 						</>
 					)}
 
 					{permission === 'admin' ? (
 						<>
 							<li>
-								<Link to="admin/users/">Panel użytkownikow</Link>
+								<Link to="/admin/users/">Panel użytkownikow</Link>
 							</li>
 							<li>
-								<Link to="admin/products/">Panel produktow</Link>
+								<Link to="/admin/products/">Panel produktow</Link>
 							</li>
 						</>
 					) : null}
