@@ -1,21 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { Requester } from '../../../utils/Requester';
-
-const SingleProduct = ({ productBrand, productCategory, productId, productImage, productName, mark }) => {
-	const [name, setName ] = useState(productName);
-	const [brand, setBrand ] = useState(productBrand);
-	const [category, setCategory ] = useState(productCategory);
-	const [image, setImage ] = useState(productImage);
-	return (
-		<div className="card">
-			<div>
-				<label>Nazwa produktu</label>
-				<input value={name} onChange={({ target: { value } })=> setName(value)} />
-			</div>
-		</div>
-	);
-};
+import Loading from '../../../components/Loading';
+import { Link } from 'react-router-dom';
+import SingleProduct from './SingleProduct';
 
 const Products = () => {
 	const [data, setData] = useState([]);
@@ -29,11 +16,16 @@ const Products = () => {
 	},[]);
 
 	return data ? (
-		<div className="dashboard">
-			{data.map((item,index)=>(
-				<SingleProduct {...item} key={`SingleProduct-${index}`} />
-			))}
-		</div>
+		<>
+			<div>
+				<Link to="/admin/products-add/"><button className="btn-large blue"> Dodaj nowy produkt </button></Link>
+			</div>
+			<div className="dashboard">
+				{data.map((item,index)=>(
+					<SingleProduct {...item} key={`SingleProduct-${index}`} />
+				))}
+			</div>
+		</>
 	): <Loading/> ;
 };
 

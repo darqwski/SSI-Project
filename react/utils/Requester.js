@@ -5,7 +5,7 @@ export const Requester = ({
 	...rest
 }) => fetch(url, {
 	...rest,
-	body: data && JSON.stringify(data),
+	body: data,
 	method,
 	headers: {
 		'Content-Type': 'application/x-www-form-urlencoded',

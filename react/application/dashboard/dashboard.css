@@ -1,13 +1,13 @@
 .dashboard {
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
 }
 
 .single-product {
     display: flex;
     padding: 1rem;
-    margin: 1rem;
+    margin: 1rem auto !important;
+    width: 30rem;
 }
 
 .single-product > .picture {
@@ -15,10 +15,23 @@
 }
 
 .single-product > .picture > img {
-    max-width: 20rem;
+    max-width: 10rem;
 }
 
 .single-product > .description {
     flex-grow: 1;
+}
 
+.search-field {
+    padding: 20px;
+    display: flex;
+}
+
+.search-field > div {
+    flex-grow: 1;
+}
+.search-icon {
+    font-size: 35px;
+    padding-top: 15px;
+    padding-right: 15px;
 }

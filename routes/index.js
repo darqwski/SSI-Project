@@ -40,32 +40,74 @@ router.get('/admin/users', authorizeAdmin, function(req, res) {
 router.get('/admin/products',authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
+router.get('/admin/products-add',authorizeAdmin, function(req, res) {
+	res.sendfile('./public/index.html');
+});
 
 /*PRODUCTS */
 router.get('/API/products', function(req, res) {
 	const con = getConnection();
 
+	const whereStatement = req.query.searchQuery ? `products.productName LIKE '%${req.query.searchQuery}%'`: '1 = 1';
 	con.connect(function(err) {
 		if (err) throw err;
-		con.query('SELECT *, AVG(value) as mark FROM products LEFT JOIN marks ON marks.productId = products.productId GROUP BY products.productId',
-			(err, result) => {
-				if (err) throw err;
-				res.send(JSON.stringify(result));
-			});
+		con.query(`
+		SELECT products.*, AVG(marks.value) as mark, 
+       	products.productId as productId,
+		isMarked.productId as isMarked
+		FROM products 
+		LEFT JOIN marks as marks ON marks.productId = products.productId 
+		LEFT JOIN marks as isMarked ON isMarked.productId = products.productId AND isMarked.userId = '${req.signedCookies.userId}'
+		WHERE ${whereStatement}
+		GROUP BY products.productId
+		`,
+		(err, result) => {
+			if (err) throw err;
+			res.send(JSON.stringify(result));
+		});
 	});
 });
 
-router.post('API/products',(req,res)=>{
+router.post('/API/products',(req,res)=>{
 	const { name, brand, category, image } = req.body;
 
-	const sqlCommand = 'INSERT INTO `products` (`productId`, `productName`, `productBrand`, `productCategory`, `productCategory`) VALUES (NULL, \''+name+'\', \''+brand+'\', \''+category+'\', \''+image+'\');';
+	const sqlCommand = 'INSERT INTO `products` (`productId`, `productName`, `productBrand`, `productCategory`, `productImage`) VALUES (NULL, \''+name+'\', \''+brand+'\', \''+category+'\', \''+image+'\');';
+
 	const con = getConnection();
 	con.query(sqlCommand, function (err) {
 		if (err) {
 			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
-
 		} else {
 			res.send(JSON.stringify({ message: 'Product has been added' }));
+		}
+	});
+});
+router.post('/API/marks',(req,res)=>{
+	const { productId, mark } = req.body;
+
+	const sqlCommand = 'INSERT INTO `marks` (`markId`, `productId`, `userId`, `value`) VALUES (NULL, \''+productId+'\', \''+req.signedCookies.userId+'\', \''+mark+'\' );';
+
+	const con = getConnection();
+	con.query(sqlCommand, function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'Product has been marked' }));
+		}
+	});
+});
+
+router.put('/API/products',(req,res)=>{
+	const { name, brand, category, image,productId } = req.body;
+
+	const sqlCommand = 'UPDATE `products` SET `productName`="'+name+'", `productBrand`="'+brand+'", `productCategory`="'+category+'", `productImage`="'+image+'" WHERE `productId` = "'+productId+'"';
+	console.log(sqlCommand);
+	const con = getConnection();
+	con.query(sqlCommand, function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'Product has been updated' }));
 		}
 	});
 });
@@ -81,17 +123,17 @@ router.post('/login', function(req, res, next) {
 			if (err) throw err;
 			if(result.length===1){
 				res.cookie('user', login, { signed: true });
+				res.cookie('userId', result[0].userId, { signed: true });
 				res.cookie('login',login);
 				res.cookie('permissionSecret',result[0].permission, { signed: true });
 				res.cookie('permission',result[0].permission);
-				res.send(JSON.stringify({ message: 'Login successfull' }));
+				res.send(JSON.stringify({ message: 'Login successful' }));
 			} else {
 				res.send(JSON.stringify({ message: 'Login failed' }));
 			}
 		});
 	});
 });
-
 
 router.get('/logout', function(req, res, next) {
 	res.cookie('user', '', { maxAge: -1 });
