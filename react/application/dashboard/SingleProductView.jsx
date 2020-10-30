@@ -16,6 +16,10 @@ const SingleProductView = ({
 	<div className="single-product card">
 		<div className="picture">
 			<img src={productImage || 'https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg'}/>
+			<div />
+			{isMarked === null && isLogged ? (
+				<MarkComponent productId={productId} refresh={refresh}/>
+			) : null}
 		</div>
 		<div className="description">
 			<div className="value-desc">
@@ -34,9 +38,6 @@ const SingleProductView = ({
 				<p className="desc">Ocen produktu</p>
 				<p className="value">{mark ? `${mark} / 5` : 'Brak ocen'}</p>
 			</div>
-			{isMarked === null && isLogged ? (
-				<MarkComponent productId={productId} refresh={refresh}/>
-			) : null}
 		</div>
 	</div>
 );

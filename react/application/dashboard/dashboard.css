@@ -41,3 +41,10 @@
     font-size: 2rem;
     cursor: pointer;
 }
+
+.picture {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-between;
+}

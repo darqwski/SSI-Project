@@ -10,15 +10,6 @@ const NavBar = () => {
 			<div className="nav-wrapper grey darken-4">
 				<ul className="left">
 					<li><Link to="/">Strona główna</Link></li>
-					{isLogged ? (
-						<li><Link to="/logout">Wyloguj</Link></li>
-					) : (
-						<>
-							<li><Link to="/login">Zaloguj</Link></li>
-							<li><Link to="/register">Zarejestruj</Link></li>
-						</>
-					)}
-
 					{permission === 'admin' ? (
 						<>
 							<li>
@@ -31,6 +22,17 @@ const NavBar = () => {
 					) : null}
 				</ul>
 				<ul className="right">
+					{isLogged ? (
+						<>
+							<li><Link to="/logout">Wyloguj</Link></li>
+							<li><Link to="/change-password">Zmień hasło</Link></li>
+						</>
+					) : (
+						<>
+							<li><Link to="/login">Zaloguj</Link></li>
+							<li><Link to="/register">Zarejestruj</Link></li>
+						</>
+					)}
 					<li>{login ? `Zalogowany jako ${login}` : 'Niezalogowany'}</li>
 				</ul>
 			</div>

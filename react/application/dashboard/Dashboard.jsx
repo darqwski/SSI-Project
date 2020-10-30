@@ -14,7 +14,6 @@ const Dashboard = () => {
 
 	const { isLogged } = useContext(AppContext);
 	useEffect(()=>{
-		setData(undefined);
 		Requester({
 			method: 'GET',
 			url: `/API/products?searchQuery=${searchQuery}&mine=${mine}`

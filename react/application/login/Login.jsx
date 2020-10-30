@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Requester } from '../../utils/Requester';
 import './login.css';
+import { SnackBarContext } from '../../context/SnackBarManager';
 
 const Login = () => {
 	const [login, setLogin] = useState('');
 	const [password, setPassword] = useState('');
 	const [error, setError] = useState('');
-
+	const { addSnackBar } = useContext(SnackBarContext);
 	const onSave = e => {
 		e.preventDefault();
 		if(!login){
@@ -23,8 +24,12 @@ const Login = () => {
 			url:'/login',
 			method: 'POST',
 			data: `login=${login}&password=${password}`
-		}).then(()=>{
-			window.location.href='../';
+		}).then(({ message })=>{
+			if(message === 'Login successful'){
+				window.location.href='../';
+			} else {
+				addSnackBar({ text: message });
+			}
 		});
 	};
 

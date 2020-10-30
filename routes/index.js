@@ -28,15 +28,12 @@ const authorizeAdmin = (req, res, next) => {
 router.get('/', function(req, res) {
 	res.sendfile('./public/index.html');
 });
-
 router.get('/login', function(req, res) {
 	res.sendfile('./public/index.html');
 });
-
 router.get('/admin/users', authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
-
 router.get('/admin/products',authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
@@ -44,6 +41,9 @@ router.get('/admin/products-add',authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
 router.get('/register',authorizeAdmin, function(req, res) {
+	res.sendfile('./public/index.html');
+});
+router.get('/change-password',authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
 
@@ -196,6 +196,31 @@ router.get('/API/users', authorizeAdmin, (req,res)=>{
 
 });
 
+router.post('/API/change-password',(req,res)=>{
+	const { oldPassword, newPassword } = req.body;
+
+	const sqlCommand = `SELECT * FROM users WHERE userId = ? AND password = '${md5(oldPassword)}'`;
+
+	const con = getConnection();
+	con.query(sqlCommand,[req.signedCookies.userId], function (err, result) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			if(result.length === 1){
+				con.query(`UPDATE users SET password = '${md5(newPassword)}' WHERE userId = ?`, [req.signedCookies.userId], (innerErr, result)=>{
+					if(innerErr){
+						console.log(innerErr)
+						res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+					} else {
+						res.send(JSON.stringify({ message: 'Password has been changed successfully' }));
+					}
+				});
+			} else {
+				res.send(JSON.stringify({ message: 'Wrong old password' }));
+			}
+		}
+	});
+});
 router.post('/API/register',(req,res)=>{
 	const { login, password } = req.body;
 
