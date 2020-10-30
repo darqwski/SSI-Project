@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MarkComponent from './MarkComponent';
 
-const SingleProductView = ({ productBrand, productCategory, productId, productImage, productName, mark, isLogged, isMarked }) => (
+const SingleProductView = ({ productBrand, productCategory, productId, productImage, productName, mark, isLogged, isMarked, refresh }) => (
 	<div className="single-product card">
 		<div className="picture">
 			<img src={productImage}/>
@@ -25,7 +25,7 @@ const SingleProductView = ({ productBrand, productCategory, productId, productIm
 				<p className="value">{mark ? `${mark} / 5` : 'Brak ocen'}</p>
 			</div>
 			{isMarked === null && isLogged ? (
-				<MarkComponent productId={productId}/>
+				<MarkComponent productId={productId} refresh={refresh}/>
 			) : null}
 		</div>
 	</div>
@@ -41,6 +41,7 @@ SingleProductView.propTypes = {
 	mark: PropTypes.string,
 	isLogged: PropTypes.bool,
 	isMarked: PropTypes.string,
+	refresh: PropTypes.func
 };
 
 export default SingleProductView;

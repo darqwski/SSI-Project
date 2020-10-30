@@ -1,0 +1,10 @@
+.dashboard {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.user-tile {
+    padding: 1rem;
+    margin: 1rem auto !important;
+    width: 30rem;
+}

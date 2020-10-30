@@ -1,0 +1,9 @@
+.register-card {
+    width: 70%;
+    margin: 5rem auto auto !important;
+}
+
+.error-text {
+    font-weight: bold;
+    padding: 1rem;
+}

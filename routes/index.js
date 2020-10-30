@@ -43,15 +43,16 @@ router.get('/admin/products',authorizeAdmin, function(req, res) {
 router.get('/admin/products-add',authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
+router.get('/register',authorizeAdmin, function(req, res) {
+	res.sendfile('./public/index.html');
+});
 
 /*PRODUCTS */
 router.get('/API/products', function(req, res) {
 	const con = getConnection();
 
 	const whereStatement = req.query.searchQuery ? `products.productName LIKE '%${req.query.searchQuery}%'`: '1 = 1';
-	con.connect(function(err) {
-		if (err) throw err;
-		con.query(`
+	const sqlQuery = `
 		SELECT products.*, AVG(marks.value) as mark, 
        	products.productId as productId,
 		isMarked.productId as isMarked
@@ -60,11 +61,14 @@ router.get('/API/products', function(req, res) {
 		LEFT JOIN marks as isMarked ON isMarked.productId = products.productId AND isMarked.userId = '${req.signedCookies.userId}'
 		WHERE ${whereStatement}
 		GROUP BY products.productId
-		`,
-		(err, result) => {
-			if (err) throw err;
-			res.send(JSON.stringify(result));
-		});
+		`;
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query(sqlQuery,
+			(err, result) => {
+				if (err) throw err;
+				res.send(JSON.stringify(result));
+			});
 	});
 });
 
@@ -82,28 +86,13 @@ router.post('/API/products',(req,res)=>{
 		}
 	});
 });
-router.post('/API/marks',(req,res)=>{
-	const { productId, mark } = req.body;
-
-	const sqlCommand = 'INSERT INTO `marks` (`markId`, `productId`, `userId`, `value`) VALUES (NULL, \''+productId+'\', \''+req.signedCookies.userId+'\', \''+mark+'\' );';
-
-	const con = getConnection();
-	con.query(sqlCommand, function (err) {
-		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
-		} else {
-			res.send(JSON.stringify({ message: 'Product has been marked' }));
-		}
-	});
-});
 
 router.put('/API/products',(req,res)=>{
 	const { name, brand, category, image,productId } = req.body;
 
-	const sqlCommand = 'UPDATE `products` SET `productName`="'+name+'", `productBrand`="'+brand+'", `productCategory`="'+category+'", `productImage`="'+image+'" WHERE `productId` = "'+productId+'"';
-	console.log(sqlCommand);
+	const sqlCommand = 'UPDATE `products` SET `productName` = ?, `productBrand`= ? , `productCategory`= ?, `productImage`= ? WHERE `productId` = ?';
 	const con = getConnection();
-	con.query(sqlCommand, function (err) {
+	con.query(sqlCommand, [name, brand, category, image, productId],function (err) {
 		if (err) {
 			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
 		} else {
@@ -112,6 +101,23 @@ router.put('/API/products',(req,res)=>{
 	});
 });
 
+/* MARKS */
+router.post('/API/marks',(req,res)=>{
+	const { productId, mark } = req.body;
+
+	const sqlCommand = 'INSERT INTO `marks` (`markId`, `productId`, `userId`, `value`) VALUES (NULL, ?, ?, ? );';
+
+	const con = getConnection();
+	con.query(sqlCommand, [productId, req.signedCookies.userId ,mark],function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'Product has been marked' }));
+		}
+	});
+});
+
+/*LOGIN */
 
 router.post('/login', function(req, res, next) {
 	const { login, password } = req.body;
@@ -141,6 +147,98 @@ router.get('/logout', function(req, res, next) {
 	res.cookie('permission', '', { maxAge: -1 });
 
 	res.redirect('/');
+});
+
+
+/* USERS */
+
+router.get('/API/users', authorizeAdmin, (req,res)=>{
+	const sqlQuery = `SELECT userId, login, permission, isActive FROM users`;
+	const con = getConnection();
+	con.connect(function(err) {
+		if (err) throw err;
+		con.query(sqlQuery,
+			(err, result) => {
+				if (err) throw err;
+				res.send(JSON.stringify(result));
+			});
+	});
+
+});
+
+router.post('/API/register',(req,res)=>{
+	const { login, password } = req.body;
+
+	const sqlCommand = `
+	INSERT INTO users (userId, login, password, permission, isActive) VALUES (NULL, ?, '${md5(password)}', 'user', '1');
+`;
+
+	const con = getConnection();
+	con.query(sqlCommand,[login], function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'User has been registered successfully' }));
+		}
+	});
+});
+router.post('/API/block',(req,res)=>{
+	const { userId } = req.body;
+
+	const sqlCommand = 'UPDATE `users` SET `isActive` = "0" WHERE `userId` = ?;'
+
+	const con = getConnection();
+	con.query(sqlCommand, [userId],function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'User has been blocked' }));
+		}
+	});
+});
+
+
+router.post('/API/unblock',(req,res)=>{
+	const { userId } = req.body;
+
+	const sqlCommand = 'UPDATE `users` SET `isActive` = "1" WHERE `userId` = ?;'
+
+	const con = getConnection();
+	con.query(sqlCommand, [userId],function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'User has been unblocked' }));
+		}
+	});
+});
+router.post('/API/admin/downgrade',(req,res)=>{
+	const { userId } = req.body;
+
+	const sqlCommand = 'UPDATE `users` SET `permission` = "user" WHERE `userId` = ?;'
+
+	const con = getConnection();
+	con.query(sqlCommand, [userId],function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'User has been downgraded' }));
+		}
+	});
+});
+router.post('/API/admin/upgrade',(req,res)=>{
+	const { userId } = req.body;
+
+	const sqlCommand = 'UPDATE `users` SET `permission` = "admin" WHERE `userId` = ?;'
+
+	const con = getConnection();
+	con.query(sqlCommand, [userId],function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			res.send(JSON.stringify({ message: 'User has been upgraded' }));
+		}
+	});
 });
 
 module.exports = router;

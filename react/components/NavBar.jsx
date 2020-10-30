@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import {AppContext} from "../context/AppContextManager";
+import { AppContext } from '../context/AppContextManager';
 
 const NavBar = () => {
 	const { isLogged, permission, login } = useContext(AppContext);
@@ -9,14 +9,16 @@ const NavBar = () => {
 		<nav>
 			<div className="nav-wrapper grey darken-4">
 				<ul className="left">
-					<li>
-						{isLogged ? (
-							<Link to="logout">Wyloguj</Link>
-						) : (
-							<Link to="login">Zaloguj</Link>
-						)}
+					<li><Link to="/">Strona główna</Link></li>
+					{isLogged ? (
+						<li><Link to="logout">Wyloguj</Link></li>
+					) : (
+						<>
+							<li><Link to="login">Zaloguj</Link></li>
+							<li><Link to="register">Zarejestruj</Link></li>
+						</>
+					)}
 
-					</li>
 					{permission === 'admin' ? (
 						<>
 							<li>

@@ -8,6 +8,9 @@ import './dashboard.css';
 const Dashboard = () => {
 	const [data, setData] = useState([]);
 	const [searchQuery, setSearchQuery] = useState('');
+	const [isRefresh, setRefresh] = useState(true)
+	const refresh = () =>  setRefresh(i=>!i);
+
 	const { isLogged } = useContext(AppContext);
 	useEffect(()=>{
 		setData(undefined);
@@ -16,7 +19,7 @@ const Dashboard = () => {
 			url: `/API/products?searchQuery=${searchQuery}`
 		})
 			.then(setData);
-	},[ searchQuery ]);
+	},[ searchQuery, isRefresh ]);
 
 	return (
 		<>
@@ -36,7 +39,7 @@ const Dashboard = () => {
 			</div>
 			<div className="dashboard">
 				{data ? data.map((item,index)=>(
-					<SingleProductView {...item} key={`SingleProduct-${index}`} isLogged={isLogged} />
+					<SingleProductView {...item} key={`SingleProduct-${index}`} isLogged={isLogged} refresh={refresh} />
 				)) : <Loading/> }
 			</div>
 		</>

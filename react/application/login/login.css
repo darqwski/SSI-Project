@@ -1,0 +1,10 @@
+.login-card {
+    width: 70%;
+    margin: 5rem auto auto !important;
+    padding: 1rem;
+}
+
+.error-text {
+    font-weight: bold;
+    padding: 1rem;
+}
