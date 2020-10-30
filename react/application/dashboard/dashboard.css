@@ -1,0 +1,24 @@
+.dashboard {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.single-product {
+    display: flex;
+    padding: 1rem;
+    margin: 1rem;
+}
+
+.single-product > .picture {
+    flex-grow: 1;
+}
+
+.single-product > .picture > img {
+    max-width: 20rem;
+}
+
+.single-product > .description {
+    flex-grow: 1;
+
+}
