@@ -35,3 +35,9 @@
     padding-top: 15px;
     padding-right: 15px;
 }
+
+.mark-stars > i {
+    color: #777777;
+    font-size: 2rem;
+    cursor: pointer;
+}

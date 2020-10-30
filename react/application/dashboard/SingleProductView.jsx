@@ -2,10 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MarkComponent from './MarkComponent';
 
-const SingleProductView = ({ productBrand, productCategory, productId, productImage, productName, mark, isLogged, isMarked, refresh }) => (
+const SingleProductView = ({
+	productBrand,
+	productCategory,
+	productId,
+	productImage,
+	productName,
+	mark,
+	isLogged,
+	isMarked,
+	refresh
+}) => (
 	<div className="single-product card">
 		<div className="picture">
-			<img src={productImage}/>
+			<img src={productImage || 'https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg'}/>
 		</div>
 		<div className="description">
 			<div className="value-desc">

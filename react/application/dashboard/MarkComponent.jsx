@@ -14,11 +14,74 @@ const MarkComponent = ({ productId, refresh }) => {
 		});
 	};
 
+	const classNameFor = index => {
+		if(index === 5){
+			if( mark === 5) return ' green-text';
+		}
+		if(index === 4){
+			if( mark === 5) return ' green-text';
+			if( mark === 4) return ' blue-text';
+		}
+		if(index === 3){
+			if( mark === 5) return ' green-text';
+			if( mark === 4) return ' blue-text';
+			if( mark === 3) return ' yellow-text';
+		}
+		if(index === 2){
+			if( mark === 5) return ' green-text';
+			if( mark === 4) return ' blue-text';
+			if( mark === 3) return ' yellow-text';
+			if( mark === 2) return ' orange-text';
+		}
+		if(index === 1) {
+			if (mark === 5) return ' green-text';
+			if (mark === 4) return ' blue-text';
+			if (mark === 3) return ' yellow-text';
+			if (mark === 2) return ' orange-text';
+			if (mark === 1) return ' red-text';
+		}
+	};
+
 	return (
 		<div>
 			<label> Wystaw ocene</label>
-			<input name="mark" min="1" max="5" onChange={({ target:{ value } })=>setMark(+value)} value={mark} />
-			<button className="btn-small" onClick={onMark}>Daj ocenę</button>
+			<div className="mark-stars" >
+				<i
+					className={`material-icons ${classNameFor(1)}`}
+					onMouseOver={()=>setMark(1)}
+					onMouseOut={()=>setMark(undefined)}
+					onClick={onMark}>
+					grade
+				</i>
+				<i
+					className={`material-icons ${classNameFor(2)}`}
+					onMouseOver={()=>setMark(2)}
+					onMouseOut={()=>setMark(undefined)}
+					onClick={onMark}>
+					grade
+				</i>
+				<i
+					className={`material-icons ${classNameFor(3)}`}
+					onMouseOver={()=>setMark(3)}
+					onMouseOut={()=>setMark(undefined)}
+					onClick={onMark}>
+					grade
+				</i>
+				<i
+					className={`material-icons ${classNameFor(4)}`}
+					onMouseOver={()=>setMark(4)}
+					onMouseOut={()=>setMark(undefined)}
+					onClick={onMark}>
+					grade
+				</i>
+				<i
+					className={`material-icons ${classNameFor(5)}`}
+					onMouseOver={()=>setMark(5)}
+					onMouseOut={()=>setMark(undefined)}
+					onClick={onMark}>
+					grade
+				</i>
+			</div>
 		</div>
 	);
 };

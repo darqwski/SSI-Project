@@ -1,0 +1,23 @@
+.dashboard-link {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.dashboard-link > * {
+    margin: 1rem;
+}
+
+.product-edit {
+    padding: 1rem;
+    margin: 1rem !important;
+}
+
+.product-edit > button {
+    margin-left: 1rem;
+}
+
+.no-products {
+    margin: auto;
+    font-size: 2rem;
+    font-weight: bold;
+}

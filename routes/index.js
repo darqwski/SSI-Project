@@ -50,15 +50,20 @@ router.get('/register',authorizeAdmin, function(req, res) {
 /*PRODUCTS */
 router.get('/API/products', function(req, res) {
 	const con = getConnection();
-
-	const whereStatement = req.query.searchQuery ? `products.productName LIKE '%${req.query.searchQuery}%'`: '1 = 1';
+	const { mine } = req.query;
+	const whereStatement = req.query.searchQuery ? `
+	products.productName LIKE '%${req.query.searchQuery}%' 
+	OR products.productBrand LIKE '%${req.query.searchQuery}%'
+	OR products.productCategory LIKE '%${req.query.searchQuery}%'
+	`: '1 = 1';
 	const sqlQuery = `
 		SELECT products.*, AVG(marks.value) as mark, 
        	products.productId as productId,
 		isMarked.productId as isMarked
 		FROM products 
 		LEFT JOIN marks as marks ON marks.productId = products.productId 
-		LEFT JOIN marks as isMarked ON isMarked.productId = products.productId AND isMarked.userId = '${req.signedCookies.userId}'
+		${mine === 'true' ? 'INNER' : 'LEFT'} JOIN marks as isMarked 
+			ON isMarked.productId = products.productId AND isMarked.userId = '${req.signedCookies.userId}'
 		WHERE ${whereStatement}
 		GROUP BY products.productId
 		`;
@@ -83,6 +88,27 @@ router.post('/API/products',(req,res)=>{
 			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
 		} else {
 			res.send(JSON.stringify({ message: 'Product has been added' }));
+		}
+	});
+});
+
+router.delete('/API/products',(req,res)=>{
+	const { productId } = req.body;
+
+	const sqlCommand = 'DELETE FROM `marks` WHERE productId = ?;';
+
+	const con = getConnection();
+	con.query(sqlCommand, [productId],function (err) {
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+		} else {
+			con.query('DELETE FROM `products` WHERE productId = ?',[productId], (err)=>{
+				if (err) {
+					res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+				} else {
+					res.send(JSON.stringify({ message: 'Product has been delete' }));
+				}
+			});
 		}
 	});
 });
@@ -153,7 +179,7 @@ router.get('/logout', function(req, res, next) {
 /* USERS */
 
 router.get('/API/users', authorizeAdmin, (req,res)=>{
-	const sqlQuery = `SELECT userId, login, permission, isActive FROM users`;
+	const sqlQuery = 'SELECT userId, login, permission, isActive FROM users';
 	const con = getConnection();
 	con.connect(function(err) {
 		if (err) throw err;
@@ -185,7 +211,7 @@ router.post('/API/register',(req,res)=>{
 router.post('/API/block',(req,res)=>{
 	const { userId } = req.body;
 
-	const sqlCommand = 'UPDATE `users` SET `isActive` = "0" WHERE `userId` = ?;'
+	const sqlCommand = 'UPDATE `users` SET `isActive` = "0" WHERE `userId` = ?;';
 
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
@@ -201,7 +227,7 @@ router.post('/API/block',(req,res)=>{
 router.post('/API/unblock',(req,res)=>{
 	const { userId } = req.body;
 
-	const sqlCommand = 'UPDATE `users` SET `isActive` = "1" WHERE `userId` = ?;'
+	const sqlCommand = 'UPDATE `users` SET `isActive` = "1" WHERE `userId` = ?;';
 
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
@@ -215,7 +241,7 @@ router.post('/API/unblock',(req,res)=>{
 router.post('/API/admin/downgrade',(req,res)=>{
 	const { userId } = req.body;
 
-	const sqlCommand = 'UPDATE `users` SET `permission` = "user" WHERE `userId` = ?;'
+	const sqlCommand = 'UPDATE `users` SET `permission` = "user" WHERE `userId` = ?;';
 
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
@@ -229,7 +255,7 @@ router.post('/API/admin/downgrade',(req,res)=>{
 router.post('/API/admin/upgrade',(req,res)=>{
 	const { userId } = req.body;
 
-	const sqlCommand = 'UPDATE `users` SET `permission` = "admin" WHERE `userId` = ?;'
+	const sqlCommand = 'UPDATE `users` SET `permission` = "admin" WHERE `userId` = ?;';
 
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {

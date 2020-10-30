@@ -8,6 +8,7 @@ import './dashboard.css';
 const Dashboard = () => {
 	const [data, setData] = useState([]);
 	const [searchQuery, setSearchQuery] = useState('');
+	const [mine, setMine] = useState(false)
 	const [isRefresh, setRefresh] = useState(true)
 	const refresh = () =>  setRefresh(i=>!i);
 
@@ -16,10 +17,10 @@ const Dashboard = () => {
 		setData(undefined);
 		Requester({
 			method: 'GET',
-			url: `/API/products?searchQuery=${searchQuery}`
+			url: `/API/products?searchQuery=${searchQuery}&mine=${mine}`
 		})
 			.then(setData);
-	},[ searchQuery, isRefresh ]);
+	},[ searchQuery, isRefresh, mine ]);
 
 	return (
 		<>
@@ -36,6 +37,15 @@ const Dashboard = () => {
 					/>
 					<label htmlFor="search-query-input">Wyszukiwanie</label>
 				</div>
+				{isLogged  && <label>
+					<input
+						type="checkbox"
+						className="filled-in"
+						checked={mine ? true : undefined}
+						onClick={()=>setMine(i=>!i)}
+					/>
+					<span>Szukaj tylko moich produktów</span>
+				</label>}
 			</div>
 			<div className="dashboard">
 				{data ? data.map((item,index)=>(

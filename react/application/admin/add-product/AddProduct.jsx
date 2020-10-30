@@ -13,7 +13,9 @@ const AddProduct = () => {
 			url: '/API/products/',
 			data: `brand=${brand}&category=${category}&image=${image}&name=${name}`
 		})
-			.then(()=>{})
+			.then(()=>{
+				window.location.href='../products/';
+			})
 			.catch(()=>{});
 	};
 
