@@ -25,7 +25,7 @@ const Login = () => {
 			method: 'POST',
 			data: `login=${login}&password=${password}`
 		}).then(({ message })=>{
-			if(message === 'Login successful'){
+			if(message === 'Logowanie pomyślne'){
 				window.location.href='../';
 			} else {
 				addSnackBar({ text: message });

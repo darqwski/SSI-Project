@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './register.css';
 import { Requester } from '../../utils/Requester';
+import { SnackBarContext } from '../../context/SnackBarManager';
 
 const Register = () => {
 	const [login, setLogin] = useState('');
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
 	const [error, setError] = useState(undefined);
+	const { addSnackBar } = useContext(SnackBarContext);
+
 	const onSave = () => {
 		if(!login){
 			setError('Brak podanego loginu');
@@ -25,8 +28,17 @@ const Register = () => {
 			url:'/API/register',
 			method: 'POST',
 			data: `login=${login}&password=${password}`
-		}).then(()=>{
-			setTimeout(()=>window.location.href='../login/', 5000);
+		}).then(({ message })=>{
+			if(message === 'Zarejestrowano pomyślnie'){
+				setError(undefined);
+				setPasswordRepeat(undefined);
+				setPassword(undefined);
+				setLogin(undefined);
+				addSnackBar({ text: `${message}, za 5 sekund nastąpi przekierowanie na stronę logowania` });
+				setTimeout(()=>window.location.href='../login/', 5000);
+			} else {
+				addSnackBar({ text: message });
+			}
 		});
 	};
 

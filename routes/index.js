@@ -40,7 +40,7 @@ router.get('/admin/products',authorizeAdmin, function(req, res) {
 router.get('/admin/products-add',authorizeAdmin, function(req, res) {
 	res.sendfile('./public/index.html');
 });
-router.get('/register',authorizeAdmin, function(req, res) {
+router.get('/register', function(req, res) {
 	res.sendfile('./public/index.html');
 });
 router.get('/change-password',authorizeAdmin, function(req, res) {
@@ -85,9 +85,9 @@ router.post('/API/products',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'Product has been added' }));
+			res.send(JSON.stringify({ message: 'Produkt dodano' }));
 		}
 	});
 });
@@ -100,13 +100,13 @@ router.delete('/API/products',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [productId],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
 			con.query('DELETE FROM `products` WHERE productId = ?',[productId], (err)=>{
 				if (err) {
-					res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+					res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 				} else {
-					res.send(JSON.stringify({ message: 'Product has been delete' }));
+					res.send(JSON.stringify({ message: 'Produkt usunięto' }));
 				}
 			});
 		}
@@ -120,9 +120,9 @@ router.put('/API/products',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [name, brand, category, image, productId],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'Product has been updated' }));
+			res.send(JSON.stringify({ message: 'Produkt został zmieniony' }));
 		}
 	});
 });
@@ -136,9 +136,9 @@ router.post('/API/marks',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [productId, req.signedCookies.userId ,mark],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'Product has been marked' }));
+			res.send(JSON.stringify({ message: 'Produkt oceniono' }));
 		}
 	});
 });
@@ -155,7 +155,7 @@ router.post('/login', function(req, res, next) {
 			if (err) throw err;
 			if(result.length===1){
 				if( !result[0].isActive ){
-					res.send(JSON.stringify({ message: 'User is blocked' }));
+					res.send(JSON.stringify({ message: 'Użytkownik jest zablokowany.' }));
 					return;
 				}
 				res.cookie('user', login, { signed: true });
@@ -163,9 +163,9 @@ router.post('/login', function(req, res, next) {
 				res.cookie('login',login);
 				res.cookie('permissionSecret',result[0].permission, { signed: true });
 				res.cookie('permission',result[0].permission);
-				res.send(JSON.stringify({ message: 'Login successful' }));
+				res.send(JSON.stringify({ message: 'Logowanie pomyślne' }));
 			} else {
-				res.send(JSON.stringify({ message: 'Login failed' }));
+				res.send(JSON.stringify({ message: 'Logowanie nie powiodło się' }));
 			}
 		});
 	});
@@ -204,36 +204,43 @@ router.post('/API/change-password',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand,[req.signedCookies.userId], function (err, result) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
 			if(result.length === 1){
 				con.query(`UPDATE users SET password = '${md5(newPassword)}' WHERE userId = ?`, [req.signedCookies.userId], (innerErr, result)=>{
 					if(innerErr){
-						console.log(innerErr)
-						res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+						res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 					} else {
-						res.send(JSON.stringify({ message: 'Password has been changed successfully' }));
+						res.send(JSON.stringify({ message: 'Hasło zmieniono pomyślnie' }));
 					}
 				});
 			} else {
-				res.send(JSON.stringify({ message: 'Wrong old password' }));
+				res.send(JSON.stringify({ message: 'Stare hasło jest błędne' }));
 			}
 		}
 	});
 });
 router.post('/API/register',(req,res)=>{
 	const { login, password } = req.body;
-
-	const sqlCommand = `
+	const con = getConnection();
+	con.query('SELECT * FROM users WHERE login = ?',[login],(err, result)=>{
+		if (err) {
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
+		} else {
+			if(result.length === 0) {
+				const sqlCommand = `
 	INSERT INTO users (userId, login, password, permission, isActive) VALUES (NULL, ?, '${md5(password)}', 'user', '1');
 `;
-
-	const con = getConnection();
-	con.query(sqlCommand,[login], function (err) {
-		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
-		} else {
-			res.send(JSON.stringify({ message: 'User has been registered successfully' }));
+				con.query(sqlCommand,[login], function (err) {
+					if (err) {
+						res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
+					} else {
+						res.send(JSON.stringify({ message: 'Zarejestrowano pomyślnie' }));
+					}
+				});
+			} else {
+				res.send(JSON.stringify({ message: 'Login już zajęty, proszę sprobowac inny' }));
+			}
 		}
 	});
 });
@@ -245,9 +252,9 @@ router.post('/API/block',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'User has been blocked' }));
+			res.send(JSON.stringify({ message: 'Użytkownika zablokowano' }));
 		}
 	});
 });
@@ -261,9 +268,9 @@ router.post('/API/unblock',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'User has been unblocked' }));
+			res.send(JSON.stringify({ message: 'Użytkownika odblokowano' }));
 		}
 	});
 });
@@ -275,9 +282,9 @@ router.post('/API/admin/downgrade',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'User has been downgraded' }));
+			res.send(JSON.stringify({ message: 'Użytkownik utracił uprawnienia administracyjne' }));
 		}
 	});
 });
@@ -289,9 +296,9 @@ router.post('/API/admin/upgrade',(req,res)=>{
 	const con = getConnection();
 	con.query(sqlCommand, [userId],function (err) {
 		if (err) {
-			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, DB is not responding' }));
+			res.status(500).send(JSON.stringify({ message: 'SERVER ERROR 500, Baza danych nie odpowiada' }));
 		} else {
-			res.send(JSON.stringify({ message: 'User has been upgraded' }));
+			res.send(JSON.stringify({ message: 'Użytkownik otrzymał uprawnienia administracyjne' }));
 		}
 	});
 });

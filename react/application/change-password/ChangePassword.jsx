@@ -25,8 +25,12 @@ const ChangePassword = () => {
 			method: 'POST',
 			data: `newPassword=${newPassword}&oldPassword=${oldPassword}`
 		}).then(({ message })=>{
-			addSnackBar({ text: message });
-			setTimeout(()=>window.location.href='../', 5000);
+			if(message == 'Hasło zmieniono pomyślnie'){
+				addSnackBar({ text: `${message}, za 5s nastąpi przekierowanie na stronę głowną` });
+				setTimeout(()=>window.location.href='../', 5000);
+			} else {
+				addSnackBar({ text: message });
+			}
 		});
 	};
 

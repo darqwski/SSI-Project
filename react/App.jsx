@@ -9,9 +9,10 @@ import AddProduct from './application/admin/add-product/AddProduct';
 import ChangePassword from './application/change-password/ChangePassword';
 import Register from './application/register/Register';
 import NavBar from './components/NavBar';
-import './materialize.css';
-import './value-desc.css';
-import SnackBarManager from "./context/SnackBarManager";
+import SnackBarManager from './context/SnackBarManager';
+import './css/materialize.css';
+import './css/value-desc.css';
+import './css/global.css';
 
 const routing = [
 	{ path: '/', component: Dashboard },

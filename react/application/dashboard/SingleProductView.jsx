@@ -35,7 +35,7 @@ const SingleProductView = ({
 				<p className="value">{productCategory}</p>
 			</div>
 			<div className="value-desc">
-				<p className="desc">Ocen produktu</p>
+				<p className="desc">Oceny produktu</p>
 				<p className="value">{mark ? `${mark} / 5` : 'Brak ocen'}</p>
 			</div>
 		</div>

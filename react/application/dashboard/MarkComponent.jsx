@@ -44,7 +44,7 @@ const MarkComponent = ({ productId, refresh }) => {
 
 	return (
 		<div>
-			<label> Wystaw ocene</label>
+			<label> Wystaw ocenę</label>
 			<div className="mark-stars" >
 				<i
 					className={`material-icons ${classNameFor(1)}`}
