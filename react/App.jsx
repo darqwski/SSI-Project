@@ -11,7 +11,6 @@ import Register from './application/register/Register';
 import NavBar from './components/NavBar';
 import SnackBarManager from './context/SnackBarManager';
 import './css/materialize.css';
-import './css/value-desc.css';
 import './css/global.css';
 
 const routing = [
@@ -37,11 +36,12 @@ const App = () => {
 	);
 };
 
-export default ()=>(
+const AppWithContext = ()=>(
 	<AppContextManager>
 		<SnackBarManager>
 			<App />
 		</SnackBarManager>
 	</AppContextManager>
-)
-;
+);
+
+export default AppWithContext;

@@ -8,8 +8,8 @@ import './dashboard.css';
 const Dashboard = () => {
 	const [data, setData] = useState([]);
 	const [searchQuery, setSearchQuery] = useState('');
-	const [mine, setMine] = useState(false)
-	const [isRefresh, setRefresh] = useState(true)
+	const [mine, setMine] = useState(false);
+	const [isRefresh, setRefresh] = useState(true);
 	const refresh = () =>  setRefresh(i=>!i);
 
 	const { isLogged } = useContext(AppContext);

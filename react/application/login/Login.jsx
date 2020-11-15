@@ -58,8 +58,6 @@ const Login = () => {
 	);
 };
 
-Login.propTypes = {
-
-};
+Login.propTypes = {};
 
 export default Login;

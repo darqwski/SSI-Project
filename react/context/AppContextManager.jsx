@@ -13,12 +13,14 @@ const AppContextManager = ({ children }) => {
 	const login = (getCookie('login'));
 	const permission = (getCookie('permission'));
 	const isLogged = !!getCookie('user');
-	console.log({ login, permission, isLogged })
+	console.log({ login, permission, isLogged });
 	return (
 		<AppContext.Provider value={{ login, permission, isLogged }}>{children}</AppContext.Provider>
 	);
 };
 
-AppContextManager.propTypes = {};
+AppContextManager.propTypes = {
+	children: PropTypes.any
+};
 
 export default AppContextManager;

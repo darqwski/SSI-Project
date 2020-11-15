@@ -1,0 +1,13 @@
+.icon-with-desc {
+    display: flex;
+    cursor: pointer;
+}
+
+.icon-with-desc:hover {
+    color: #777777;
+}
+
+.icon-with-desc > i {
+    padding-top: 0.5rem;
+    font-size: 2rem;
+}

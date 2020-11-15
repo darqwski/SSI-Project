@@ -33,7 +33,6 @@ app.use(cookieParser('session'));
 
 routes.forEach((route)=>{
 	const element = require(`./routes/${route}`);
-	console.log(`./routes/${route}`);
 	app.use(`/${route}`, element);
 });
 
